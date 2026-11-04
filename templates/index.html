@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Core AI - Automation Control Center</title>
+  <meta name="description" content="Local control dashboard for Google Maps lead scraping and automated WhatsApp outreach with anti-ban protection.">
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- HEADER BAR -->
+    <header class="top-nav">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>Core AI <span>Control Center</span></h1>
+          <span class="badge-free">100% Free & Local</span>
+        </div>
+      </div>
+
+      <!-- Live Status Indicators -->
+      <div class="header-status">
+        <div class="status-indicator" id="indicator-supabase" style="cursor: pointer;" title="Click for Supabase cloud settings">
+          <span class="status-dot" id="dot-supabase"></span>
+          <span class="status-label">Supabase: <b id="text-supabase-status">Checking...</b></span>
+        </div>
+        <div class="status-indicator" id="indicator-scraper">
+          <span class="status-dot"></span>
+          <span class="status-label">Scraper: <b id="text-scraper-status">Idle</b></span>
+        </div>
+        <div class="status-indicator" id="indicator-sender">
+          <span class="status-dot"></span>
+          <span class="status-label">WhatsApp: <b id="text-sender-status">Idle</b></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- METRICS CARDS ROW -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <span class="kpi-title">Total Clean Leads</span>
+          <h3 class="kpi-value" id="kpi-total-contacts">0</h3>
+          <span class="kpi-sub">Cleaned 10-digit mobile numbers</span>
+        </div>
+        <div class="kpi-icon icon-cyan">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <span class="kpi-title">Delivered Messages</span>
+          <h3 class="kpi-value text-green" id="kpi-delivered-contacts">0</h3>
+          <span class="kpi-sub">Logged in delivery_log.txt</span>
+        </div>
+        <div class="kpi-icon icon-emerald">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <span class="kpi-title">Pending in Queue</span>
+          <h3 class="kpi-value text-amber" id="kpi-pending-contacts">0</h3>
+          <span class="kpi-sub">Ready for next campaign</span>
+        </div>
+        <div class="kpi-icon icon-amber">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <span class="kpi-title">Anti-Ban Protection</span>
+          <h3 class="kpi-value text-purple" id="kpi-anti-ban">Active</h3>
+          <span class="kpi-sub">30s - 60s randomized pause</span>
+        </div>
+        <div class="kpi-icon icon-purple">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="tab-scraper">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Google Maps Scraper
+      </button>
+      <button class="tab-btn" data-tab="tab-sender">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        WhatsApp Sender
+      </button>
+      <button class="tab-btn" data-tab="tab-contacts">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Contacts Directory
+      </button>
+      <button class="tab-btn" data-tab="tab-template">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Message Template
+      </button>
+      <button class="tab-btn" data-tab="tab-audit">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="10" y1="12" x2="14" y2="12"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+        Delivery Logs
+      </button>
+      <button class="tab-btn" data-tab="tab-blacklist">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        Banned Institutes
+      </button>
+    </nav>
+
+    <!-- TAB 1: GOOGLE MAPS SCRAPER -->
+    <div class="tab-pane active" id="tab-scraper">
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>Lead Extraction Config</h2>
+              <p class="card-desc">Enter runtime parameters to search Google Maps and extract clean 10-digit mobile leads.</p>
+            </div>
+            <span class="badge-sanitized">Auto-strips +91 & 0</span>
+          </div>
+
+          <form id="form-scraper" class="form-layout">
+            <div class="input-row">
+              <div class="input-group">
+                <label for="scraper-location">Target Location / City</label>
+                <div class="input-wrapper">
+                  <svg class="field-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <input type="text" id="scraper-location" placeholder="e.g. Moradabad, Delhi, Mumbai" required value="Moradabad">
+                </div>
+              </div>
+
+              <div class="input-group">
+                <label for="scraper-query">Search Query</label>
+                <div class="input-wrapper">
+                  <svg class="field-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input type="text" id="scraper-query" placeholder="e.g. schools, coaching centers, gyms" required value="coaching centers">
+                </div>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <div class="slider-header">
+                <label for="scraper-limit">Maximum Listings to Discover</label>
+                <span class="slider-val" id="limit-val">25</span>
+              </div>
+              <input type="range" id="scraper-limit" min="5" max="100" step="5" value="25">
+            </div>
+
+            <div class="notice-box">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>Phone numbers will be automatically validated and saved as <b>pure 10-digit mobile numbers</b> (stripping +91 and leading 0) directly into <code>contacts.csv</code>.</span>
+            </div>
+
+            <div class="action-row">
+              <button type="submit" class="btn btn-primary" id="btn-start-scraper">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Launch Scraper
+              </button>
+              <button type="button" class="btn btn-danger" id="btn-stop-scraper" disabled>
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
+                Stop Scraper
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Scraper Real-Time Progress -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Live Scraping Status</h2>
+            <span class="status-pill" id="scraper-status-pill">Idle</span>
+          </div>
+
+          <div class="scraper-monitor">
+            <div class="progress-container">
+              <div class="progress-labels">
+                <span id="scraper-progress-text">Progress: 0 / 0</span>
+                <span id="scraper-progress-pct">0%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-bar" id="scraper-progress-bar" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div class="stats-mini-grid">
+              <div class="mini-stat">
+                <span class="mini-stat-label">Active Query</span>
+                <b class="mini-stat-val" id="monitor-query">-</b>
+              </div>
+              <div class="mini-stat">
+                <span class="mini-stat-label">Location</span>
+                <b class="mini-stat-val" id="monitor-location">-</b>
+              </div>
+              <div class="mini-stat">
+                <span class="mini-stat-label">Leads Saved</span>
+                <b class="mini-stat-val text-green" id="monitor-found">0</b>
+              </div>
+            </div>
+
+            <!-- CAPTCHA Alert Box -->
+            <div class="captcha-alert" id="captcha-alert-box" style="display: none;">
+              <div class="captcha-header">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <h4>Google CAPTCHA Detected!</h4>
+              </div>
+              <p>Please switch to the open Chrome browser window, solve the verification challenge, then click below to resume.</p>
+              <button class="btn btn-warning" id="btn-captcha-resolved">
+                ✓ I Have Solved the Challenge
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: WHATSAPP SENDER -->
+    <div class="tab-pane" id="tab-sender">
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>WhatsApp Campaign Controller</h2>
+              <p class="card-desc">Dispatch personalized messages with randomized human-like delays.</p>
+            </div>
+            <span class="badge-free">Persistent Session</span>
+          </div>
+
+          <form id="form-sender" class="form-layout">
+            <div class="input-row">
+              <div class="input-group">
+                <label for="sender-min-delay">Min Delay (Seconds)</label>
+                <input type="number" id="sender-min-delay" min="15" max="60" value="30">
+              </div>
+              <div class="input-group">
+                <label for="sender-max-delay">Max Delay (Seconds)</label>
+                <input type="number" id="sender-max-delay" min="30" max="120" value="60">
+              </div>
+            </div>
+
+            <div class="notice-box notice-purple">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span><b>Anti-Ban Active:</b> Random delay of 30-60s simulates human typing. Uses your saved session in <code>whatsapp_session/</code> (QR scan needed only once).</span>
+            </div>
+
+            <div class="action-row">
+              <button type="button" class="btn btn-success" id="btn-start-sender-live">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Start Live Campaign
+              </button>
+              <button type="button" class="btn btn-secondary" id="btn-start-sender-test">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                Dry Run (Test Mode)
+              </button>
+              <button type="button" class="btn btn-danger" id="btn-stop-sender" disabled>
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
+                Stop
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Sender Live Monitor -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Live Campaign Monitor</h2>
+            <span class="status-pill" id="sender-status-pill">Idle</span>
+          </div>
+
+          <div class="sender-monitor">
+            <div class="progress-container">
+              <div class="progress-labels">
+                <span id="sender-progress-text">Dispatched: 0 / 0</span>
+                <span id="sender-progress-pct">0%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-bar progress-green" id="sender-progress-bar" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- QR Code Scan Alert Box -->
+            <div class="qr-alert-box" id="qr-alert-box" style="display: none;">
+              <div class="qr-alert-header">
+                <span class="qr-pulse"></span>
+                <div>
+                  <h4>📱 WhatsApp Web Authentication Required</h4>
+                  <p>WhatsApp runs in a <b>dedicated automation window</b> (not inside this dashboard tab). Scan this QR code right here to connect!</p>
+                </div>
+              </div>
+              <div class="qr-preview-container">
+                <div class="qr-img-wrap">
+                  <img id="qr-code-img" src="/api/sender/qr_code" alt="WhatsApp QR Code" class="qr-preview-img" />
+                </div>
+                <div class="qr-instructions">
+                  <p class="qr-step-title"><b>How to Connect:</b></p>
+                  <ol>
+                    <li>Open <b>WhatsApp</b> on your phone.</li>
+                    <li>Go to <b>Settings</b> or <b>Menu (⋮)</b> &rarr; <b>Linked Devices</b>.</li>
+                    <li>Tap <b>Link a Device</b> and point your camera at the QR code on the left.</li>
+                  </ol>
+                  <div class="qr-note-badge">
+                    <span>💡 <b>Persistent Session:</b> Once scanned, your login is permanently saved in <code>whatsapp_session/</code>. You won't need to scan again!</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cooldown Timer Card -->
+            <div class="cooldown-box" id="cooldown-box" style="display: none;">
+              <div class="cooldown-header">
+                <span class="cooldown-pulse"></span>
+                <span><b>Anti-Ban Pause Active:</b> Waiting before next message</span>
+                <span class="cooldown-clock" id="cooldown-seconds">45s</span>
+              </div>
+            </div>
+
+            <div class="stats-mini-grid">
+              <div class="mini-stat">
+                <span class="mini-stat-label">Delivered</span>
+                <b class="mini-stat-val text-green" id="sender-count-success">0</b>
+              </div>
+              <div class="mini-stat">
+                <span class="mini-stat-label">Invalid / Skipped</span>
+                <b class="mini-stat-val text-amber" id="sender-count-invalid">0</b>
+              </div>
+              <div class="mini-stat">
+                <span class="mini-stat-label">Current Recipient</span>
+                <b class="mini-stat-val" id="sender-current-lead">-</b>
+              </div>
+            </div>
+
+            <div class="checkpoint-action">
+              <button class="btn btn-ghost" id="btn-reset-checkpoint">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                Reset Checkpoint (Allow Resending to All Contacts)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: CONTACTS DIRECTORY -->
+    <div class="tab-pane" id="tab-contacts">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Leads & Contacts Management (<code>contacts.csv</code>)</h2>
+            <p class="card-desc">All extracted leads sanitized to 10 digits without +91 prefix.</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-emerald" id="btn-sync-supabase" title="Sync local contacts to Supabase PostgreSQL">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
+              Sync to Supabase
+            </button>
+            <a href="/api/contacts/export" class="btn btn-secondary">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export CSV
+            </a>
+            <button class="btn btn-primary" id="btn-open-add-contact">
+              + Add Lead
+            </button>
+            <button class="btn btn-danger-outline" id="btn-clear-contacts">
+              Clear All
+            </button>
+          </div>
+        </div>
+
+        <div class="table-controls">
+          <div class="search-box">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="contact-search" placeholder="Search by name, 10-digit phone, city...">
+          </div>
+          <div class="filter-pills">
+            <button class="filter-pill active" data-filter="all">All (<span id="filter-all-count">0</span>)</button>
+            <button class="filter-pill" data-filter="pending">Pending (<span id="filter-pending-count">0</span>)</button>
+            <button class="filter-pill" data-filter="sent">Sent (<span id="filter-sent-count">0</span>)</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="leads-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Institution / Business Name</th>
+                <th>Clean Phone (10-Digit)</th>
+                <th>Location</th>
+                <th>Query</th>
+                <th>Campaign Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="contacts-table-body">
+              <tr>
+                <td colspan="7" class="empty-state">Loading leads...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: MESSAGE TEMPLATE -->
+    <div class="tab-pane" id="tab-template">
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>Message Template Editor</h2>
+              <p class="card-desc">Customize your outreach copy. Click dynamic placeholders to insert them.</p>
+            </div>
+            <button class="btn btn-primary" id="btn-save-template">
+              Save Template
+            </button>
+          </div>
+
+          <div class="chips-container">
+            <span class="chip-label">Insert Dynamic Tags:</span>
+            <button type="button" class="tag-chip" data-tag="{name}">+ {name}</button>
+            <button type="button" class="tag-chip" data-tag="{location}">+ {location}</button>
+            <button type="button" class="tag-chip" data-tag="{query}">+ {query}</button>
+            <button type="button" class="tag-chip" data-tag="{address}">+ {address}</button>
+            <button type="button" class="tag-chip" data-tag="{phone}">+ {phone}</button>
+          </div>
+
+          <textarea id="template-editor" rows="12" class="template-textarea" placeholder="Write your personalized outreach message here..."></textarea>
+        </div>
+
+        <!-- Live WhatsApp Chat Bubble Preview -->
+        <div class="card">
+          <div class="card-header">
+            <h2>WhatsApp Live Preview</h2>
+            <span class="preview-badge">Live Rendering</span>
+          </div>
+
+          <div class="whatsapp-mockup">
+            <div class="wa-header">
+              <div class="wa-avatar">
+                <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <div class="wa-contact-info">
+                <span class="wa-name" id="preview-contact-name">Delhi Public School</span>
+                <span class="wa-status">online</span>
+              </div>
+            </div>
+
+            <div class="wa-chat-window">
+              <div class="wa-bubble">
+                <div class="wa-message-text" id="preview-message-body">
+                  Loading template preview...
+                </div>
+                <div class="wa-timestamp">
+                  <span id="preview-time">19:45</span>
+                  <svg class="wa-checks" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#53bdeb" stroke-width="2.5"><polyline points="18 6 7 17 2 12"/><polyline points="22 10 13 19 11 17"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: AUDIT LOGS -->
+    <div class="tab-pane" id="tab-audit">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>WhatsApp Delivery Audit Log</h2>
+            <p class="card-desc">Persistent history stored in <code>delivery_log.txt</code>.</p>
+          </div>
+          <button class="btn btn-secondary" id="btn-refresh-audit">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Refresh
+          </button>
+        </div>
+
+        <div class="audit-log-list" id="audit-log-list">
+          <div class="empty-state">No delivery records found yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: BANNED INSTITUTES BLACKLIST -->
+    <div class="tab-pane" id="tab-blacklist">
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>Banned Institutes / Exclusion List</h2>
+              <p class="card-desc">Institutes matching these patterns are permanently blocked from scraping and WhatsApp outreach.</p>
+            </div>
+            <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);">Shield Active</span>
+          </div>
+
+          <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
+            <p style="margin: 0; color: #fca5a5; font-size: 0.9rem;">
+              <strong>🛡️ Active Bans:</strong> Institutes like <strong>Allen</strong>, <strong>Aakash / Akash</strong>, and <strong>Physics Wallah (PW)</strong> are automatically excluded from Google Maps scraping, CSV storage, and WhatsApp dispatch.
+            </p>
+          </div>
+
+          <div class="input-group">
+            <label>Add New Banned Institute / Keyword</label>
+            <div style="display: flex; gap: 10px;">
+              <input type="text" id="input-new-banned" placeholder="e.g. fiitjee or resonance" style="flex: 1;">
+              <button class="btn btn-primary" id="btn-add-banned">Add to Ban List</button>
+            </div>
+            <small class="field-hint">Added keywords are saved in <code>banned_institutes.txt</code>.</small>
+          </div>
+
+          <h3 style="font-size: 1rem; margin-top: 24px; margin-bottom: 12px;">Active Blacklist Rules</h3>
+          <div id="blacklist-chips" style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <span class="chip">Loading banned list...</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>How Blacklist Protection Works</h2>
+              <p class="card-desc">Multi-layer exclusion across the entire pipeline</p>
+            </div>
+          </div>
+          <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;">
+            <div style="margin-bottom: 16px;">
+              <h4 style="color: #fff; margin-bottom: 4px;">1. Scraper Filtering (scraper.py)</h4>
+              <p>During Google Maps scraping, any listing matching a banned pattern is discarded immediately and never saved to <code>contacts.csv</code>.</p>
+            </div>
+            <div style="margin-bottom: 16px;">
+              <h4 style="color: #fff; margin-bottom: 4px;">2. WhatsApp Sender Guard (sender.py & app.py)</h4>
+              <p>Before launching WhatsApp Web for any lead, the sender checks the name against the exclusion list. Banned institutes are skipped with zero delay and marked as <code>[BANNED]</code>.</p>
+            </div>
+            <div>
+              <h4 style="color: #fff; margin-bottom: 4px;">3. Safe Word Boundary Matching</h4>
+              <p>Matching uses intelligent word boundaries so subjects like <em>"Marshall Institute of Physics & Chemistry"</em> are not mistakenly blocked.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UNIVERSAL REAL-TIME TERMINAL CONSOLE -->
+    <section class="terminal-card">
+      <div class="terminal-header">
+        <div class="terminal-dots">
+          <span class="term-dot red"></span>
+          <span class="term-dot yellow"></span>
+          <span class="term-dot green"></span>
+          <span class="terminal-title">Universal Live Automation Terminal (Real-time SSE Stream)</span>
+        </div>
+        <div class="terminal-tools">
+          <button class="btn-term-tool" id="btn-clear-term" title="Clear console">Clear</button>
+          <button class="btn-term-tool" id="btn-toggle-term">Minimize</button>
+        </div>
+      </div>
+      <div class="terminal-body" id="terminal-output">
+        <div class="term-line term-info">[SYSTEM] Core AI Automation Control Center initialized. Listening for tasks...</div>
+      </div>
+    </section>
+
+    <!-- MANUAL CONTACT MODAL -->
+    <div class="modal-backdrop" id="modal-add-contact">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>Add New Lead Manually</h3>
+          <button class="modal-close" id="modal-close-btn">&times;</button>
+        </div>
+        <form id="form-add-lead">
+          <div class="input-group">
+            <label>Institution / Business Name</label>
+            <input type="text" id="add-lead-name" placeholder="e.g. Cambridge Academy" required>
+          </div>
+          <div class="input-group">
+            <label>Phone Number (10 digits or with local prefix)</label>
+            <input type="text" id="add-lead-phone" placeholder="e.g. 9876543210 or 09876543210" required>
+            <small class="field-hint">Any +91 or leading 0 will be stripped automatically.</small>
+          </div>
+          <div class="input-group">
+            <label>City / Location</label>
+            <input type="text" id="add-lead-location" placeholder="e.g. Moradabad">
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Lead</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- SUPABASE CONFIG MODAL -->
+    <div class="modal-backdrop" id="modal-supabase-info">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>Supabase Cloud Integration</h3>
+          <button class="modal-close" id="modal-sb-close-btn">&times;</button>
+        </div>
+        <div class="sb-modal-content">
+          <div class="sb-status-box" id="sb-modal-status-box">
+            <span class="status-dot" id="sb-modal-dot"></span>
+            <span id="sb-modal-status-text">Checking status...</span>
+          </div>
+          <p class="sb-help-text" style="margin-top: 12px; color: var(--text-secondary); font-size: 0.9rem;">
+            To connect Supabase, add your credentials to the <code>.env</code> file in this folder:
+          </p>
+          <pre class="sb-code-block" style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; font-family: monospace; font-size: 0.85rem; margin: 10px 0; border: 1px solid var(--border-color); color: #38bdf8;">SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=your-anon-or-service-key</pre>
+          <p class="sb-help-text" style="color: var(--text-muted); font-size: 0.85rem;">
+            Run the SQL schema in <code>supabase_schema.sql</code> in your Supabase SQL Editor to initialize tables.
+          </p>
+          <div class="modal-actions" style="margin-top: 16px;">
+            <button type="button" class="btn btn-secondary" id="modal-sb-dismiss-btn">Close</button>
+            <button type="button" class="btn btn-primary" id="btn-sb-reconnect">Test / Reconnect</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>

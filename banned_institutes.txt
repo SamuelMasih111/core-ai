@@ -1,0 +1,18 @@
+# Banned / Blacklisted Institutes
+# Any institute whose name matches these keywords or patterns will be:
+# 1. Blocked from WhatsApp messaging (sender.py & app.py)
+# 2. Excluded during Google Maps scraping (scraper.py)
+# 3. Filtered out from contacts.csv
+#
+# Rules: One keyword/pattern per line (case-insensitive)
+allen
+aakash
+akash
+physics wallah
+physicswallah
+pw vidyapeeth
+pw pathshala
+pw coaching
+\bpw\b
+aesl
+

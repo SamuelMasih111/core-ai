@@ -1,0 +1,22 @@
+# Environment variables and secrets
+/.env
+
+# WhatsApp session cache and Chrome profiles (Never commit session tokens or cache)
+whatsapp_session/
+whatsapp_session_corrupt/
+*.pma
+*.dmp
+wa_screen.png
+
+# Python bytecode and cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# System and IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
