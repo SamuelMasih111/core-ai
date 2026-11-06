@@ -49,6 +49,9 @@ except ImportError:
 # Blacklist and banned institute filtering
 from blacklist import is_banned_institute
 
+# Spintax and anti-ban message mutator
+from spintax import mutate_message, parse_spintax
+
 try:
     from selenium import webdriver
     from selenium.webdriver.common.by import By
@@ -87,8 +90,14 @@ LOG_FILE = os.path.join(BASE_DIR, "delivery_log.txt")
 TEMPLATE_FILE = os.path.join(BASE_DIR, "message_template.txt")
 SESSION_DIR = os.path.join(BASE_DIR, "whatsapp_session")
 
-MIN_DELAY_SECONDS = 30
-MAX_DELAY_SECONDS = 60
+# Advanced Anti-Ban Settings
+MIN_DELAY_SECONDS = int(os.getenv("MIN_DELAY_SECONDS", "45"))
+MAX_DELAY_SECONDS = int(os.getenv("MAX_DELAY_SECONDS", "85"))
+BATCH_SIZE = int(os.getenv("BATCH_SIZE", "5"))                         # Messages before taking a long cooling break
+BATCH_COOLDOWN_MINUTES = int(os.getenv("BATCH_COOLDOWN_MINUTES", "5")) # Break duration (minutes)
+DAILY_SAFETY_LIMIT = int(os.getenv("DAILY_SAFETY_LIMIT", "25"))         # Safe daily threshold per WhatsApp number
+HUMAN_TYPING_MODE = os.getenv("HUMAN_TYPING_MODE", "true").lower() in ["true", "1", "yes"]
+SAFE_LINK_MODE = os.getenv("SAFE_LINK_MODE", "true").lower() in ["true", "1", "yes"]
 
 DEFAULT_TEMPLATE = """Hello {name},
 
@@ -186,33 +195,40 @@ def load_message_template() -> str:
     return DEFAULT_TEMPLATE
 
 
-def format_message(template: str, row: dict) -> str:
+def format_message(template: str, row: dict, safe_link: bool = False, soft_opt_out: bool = True) -> str:
     """
-    Substitutes placeholder values ({name}, {location}, {query}, etc.)
-    with contact details.
+    Substitutes placeholder values, resolves Spintax {Option1|Option2},
+    and injects randomized invisible entropy for a 100% unique cryptographic hash.
+    Also appends a polite opt-out closer to drastically reduce 'Report Spam' actions.
     """
-    name = str(row.get("Name", "there")).strip()
-    location = str(row.get("Location", "your city")).strip()
-    query = str(row.get("Search_Query", "institutions")).strip()
-    address = str(row.get("Address", "")).strip()
-
-    # Format greeting name cleanly
-    clean_name = name
-    for suffix in [", Inc.", " Inc", " Pvt Ltd", " Ltd", " LLC", " Co."]:
-        clean_name = clean_name.replace(suffix, "")
-
-    msg = template.format(
-        name=clean_name,
-        location=location,
-        query=query,
-        address=address,
-        phone=str(row.get("Phone", ""))
+    return mutate_message(
+        template=template,
+        lead=row,
+        include_soft_opt_out=soft_opt_out,
+        safe_link_mode=safe_link
     )
-    return msg
+
+
+def count_messages_sent_today(log_path: str = LOG_FILE) -> int:
+    """
+    Counts how many successful live messages have been sent in the current calendar day.
+    Helps prevent exceeding the recommended daily warm-up threshold.
+    """
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    count = 0
+    if os.path.exists(log_path):
+        try:
+            with open(log_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    if line.startswith(f"[{today_str}") and "[SUCCESS]" in line and "Simulated" not in line:
+                        count += 1
+        except Exception:
+            pass
+    return count
 
 
 # ==============================================================================
-# ANTI-BAN DELAY CONTROLLER
+# ANTI-BAN DELAY & BATCH COOLDOWN CONTROLLER
 # ==============================================================================
 def anti_ban_delay(min_s: int = MIN_DELAY_SECONDS, max_s: int = MAX_DELAY_SECONDS) -> None:
     """
@@ -226,6 +242,20 @@ def anti_ban_delay(min_s: int = MIN_DELAY_SECONDS, max_s: int = MAX_DELAY_SECOND
         print(f"    ⏳ Waiting... {remaining:02d}s remaining [Anti-ban cooldown]", end="\r")
         time.sleep(1)
     print("    [✓] Cooldown finished. Resuming queue...                  \n")
+
+
+def batch_cooldown_pause(minutes: int = BATCH_COOLDOWN_MINUTES) -> None:
+    """
+    Pauses execution for a cooling break (e.g. 5 minutes) after sending a batch of messages.
+    Crucial to prevent WhatsApp telemetry from detecting continuous robot patterns.
+    """
+    total_seconds = minutes * 60
+    print(f"\n[☕ BATCH COOLING BREAK] Taking a {minutes}-minute rest to protect your WhatsApp account health...")
+    for rem in range(total_seconds, 0, -1):
+        m, s = divmod(rem, 60)
+        print(f"    ⏳ Account resting... {m:02d}:{s:02d} remaining [Batch safety cooldown]", end="\r")
+        time.sleep(1)
+    print("    [✓] Cooldown finished. Resuming queue...                                     \n")
 
 
 # ==============================================================================
@@ -419,10 +449,33 @@ def normalize_whatsapp_phone(phone: str, default_country_code: str = "91") -> st
 # ==============================================================================
 # SENDING ENGINE (SELENIUM WHATSAPP WEB)
 # ==============================================================================
-def send_via_selenium(driver: webdriver.Chrome, phone: str, message: str) -> tuple[bool, str]:
+def type_message_like_human(input_box, message: str) -> None:
+    """
+    Simulates authentic human typing by dispatching characters with micro-pauses
+    and Shift+Enter for line breaks. Fires genuine Chromium DOM events ('keydown',
+    'input', 'keyup') with isTrusted: true, evading client-side bot detection.
+    """
+    lines = message.split("\n")
+    for l_idx, line in enumerate(lines):
+        for char in line:
+            input_box.send_keys(char)
+            # 15ms - 40ms realistic keystroke delay
+            time.sleep(random.uniform(0.015, 0.040))
+        if l_idx < len(lines) - 1:
+            input_box.send_keys(Keys.SHIFT, Keys.ENTER)
+            time.sleep(random.uniform(0.04, 0.10))
+
+
+def send_via_selenium(
+    driver: webdriver.Chrome,
+    phone: str,
+    message: str,
+    human_typing: bool = True
+) -> tuple[bool, str]:
     """
     Sends a personalized message to the recipient using WhatsApp Web.
     Properly prefixes country code (+91), handles invalid numbers & modern DOM elements.
+    Uses human typing simulation to evade bot detection telemetry.
     
     Returns:
         (success: bool, status_message: str)
@@ -435,13 +488,18 @@ def send_via_selenium(driver: webdriver.Chrome, phone: str, message: str) -> tup
         return False, "Landline number cannot receive WhatsApp messages"
 
     whatsapp_phone = normalize_whatsapp_phone(phone)
-    encoded_message = urllib.parse.quote(message)
-    send_url = f"https://web.whatsapp.com/send?phone={whatsapp_phone}&text={encoded_message}"
+
+    if human_typing:
+        # Anti-Ban: Load clean chat URL without query string injection (avoids 0-keystroke detection)
+        send_url = f"https://web.whatsapp.com/send?phone={whatsapp_phone}"
+    else:
+        encoded_message = urllib.parse.quote(message)
+        send_url = f"https://web.whatsapp.com/send?phone={whatsapp_phone}&text={encoded_message}"
 
     driver.get(send_url)
 
     # Allow WhatsApp Web to resolve the contact and decrypt chat
-    max_wait_seconds = 25
+    max_wait_seconds = 28
     start_time = time.time()
 
     try:
@@ -487,36 +545,50 @@ def send_via_selenium(driver: webdriver.Chrome, phone: str, message: str) -> tup
                         pass
                 return False, "Not registered on WhatsApp"
 
-            # 2. Check if send button is visible (modern & legacy selectors)
-            send_selectors = [
-                "//button[@aria-label='Send' or @data-tab='11' or contains(@aria-label, 'Send')]",
-                "//button[.//span[@data-icon='send' or @data-icon='send-refreshed' or @data-icon='send-light' or @data-icon='wds-ic-send']]",
-                "//span[@data-icon='send' or @data-icon='send-refreshed' or @data-icon='wds-ic-send']/ancestor::button",
-                "//footer//button[contains(@aria-label, 'Send') or @data-tab='11']"
+            # 2. Check for message input box
+            input_selectors = [
+                "//footer//div[@contenteditable='true']",
+                "//div[@contenteditable='true'][@data-tab='10' or contains(@class, 'selectable-text')]",
+                "//div[@contenteditable='true'][contains(@aria-label, 'Type a message')]"
             ]
-            for s_xpath in send_selectors:
-                send_buttons = driver.find_elements(By.XPATH, s_xpath)
-                if send_buttons and send_buttons[0].is_displayed():
-                    time.sleep(random.uniform(0.6, 1.2))
-                    try:
-                        send_buttons[0].click()
-                    except Exception:
-                        driver.execute_script("arguments[0].click();", send_buttons[0])
-                    # Wait for message dispatch confirmation
-                    time.sleep(3)
-                    return True, "Message sent successfully"
+            input_box = None
+            for in_xpath in input_selectors:
+                inputs = driver.find_elements(By.XPATH, in_xpath)
+                if inputs and inputs[0].is_displayed():
+                    input_box = inputs[0]
+                    break
 
-        # 3. Fallback: Focus message input and press Enter
-        input_selectors = [
-            "//footer//div[@contenteditable='true']",
-            "//div[@contenteditable='true'][@data-tab='10' or contains(@class, 'selectable-text')]",
-            "//div[@contenteditable='true'][contains(@aria-label, 'Type a message')]"
-        ]
-        for in_xpath in input_selectors:
-            input_boxes = driver.find_elements(By.XPATH, in_xpath)
-            if input_boxes and input_boxes[0].is_displayed():
-                box = input_boxes[0]
-                box.send_keys(Keys.ENTER)
+            if input_box:
+                if human_typing:
+                    # Focus input box and simulate human keystrokes
+                    try:
+                        input_box.click()
+                    except Exception:
+                        driver.execute_script("arguments[0].focus();", input_box)
+                    time.sleep(random.uniform(0.4, 0.8))
+                    type_message_like_human(input_box, message)
+                    time.sleep(random.uniform(0.6, 1.2))
+
+                # 3. Look for Send Button
+                send_selectors = [
+                    "//button[@aria-label='Send' or @data-tab='11' or contains(@aria-label, 'Send')]",
+                    "//button[.//span[@data-icon='send' or @data-icon='send-refreshed' or @data-icon='send-light' or @data-icon='wds-ic-send']]",
+                    "//span[@data-icon='send' or @data-icon='send-refreshed' or @data-icon='wds-ic-send']/ancestor::button",
+                    "//footer//button[contains(@aria-label, 'Send') or @data-tab='11']"
+                ]
+                for s_xpath in send_selectors:
+                    send_buttons = driver.find_elements(By.XPATH, s_xpath)
+                    if send_buttons and send_buttons[0].is_displayed():
+                        time.sleep(random.uniform(0.5, 0.9))
+                        try:
+                            send_buttons[0].click()
+                        except Exception:
+                            driver.execute_script("arguments[0].click();", send_buttons[0])
+                        time.sleep(3)
+                        return True, "Message sent successfully"
+
+                # 4. Fallback: Press ENTER in the input box
+                input_box.send_keys(Keys.ENTER)
                 time.sleep(3)
                 return True, "Message sent via Enter key"
 
@@ -593,14 +665,29 @@ def main():
     pending_contacts = [c for c in all_contacts if c.get("Phone", "").strip() not in processed_phones]
     pending_count = len(pending_contacts)
 
-    print("📊 CAMPAIGN OVERVIEW:")
+    sent_today = count_messages_sent_today()
+
+    print("📊 CAMPAIGN OVERVIEW & ANTI-BAN SHIELD HEALTH:")
     print(f"   • Total valid contacts in CSV:    {total_in_csv}")
     print(f"   • Already processed previously:   {len(processed_phones)}")
     print(f"   • Remaining queued to send:       {pending_count}")
-    print(f"   • Mandatory anti-ban pause:       {MIN_DELAY_SECONDS} to {MAX_DELAY_SECONDS} seconds")
+    print(f"   • Messages sent today:            {sent_today} / {DAILY_SAFETY_LIMIT} (Daily safety threshold)")
+    print(f"   • Human typing simulation:        {'ACTIVE (Evades bot telemetry)' if HUMAN_TYPING_MODE else 'OFF'}")
+    print(f"   • Spintax & unique hash entropy:  ACTIVE (Unique SHA-256 hash per dispatch)")
+    print(f"   • Randomized delay range:         {MIN_DELAY_SECONDS} to {MAX_DELAY_SECONDS} seconds")
+    print(f"   • Batch cooling break:            Every {BATCH_SIZE} sends -> {BATCH_COOLDOWN_MINUTES} min pause")
     print(f"   • Delivery log output:            {os.path.abspath(LOG_FILE)}")
     print(f"   • Session storage path:           {SESSION_DIR}")
     print("-" * 65)
+
+    if sent_today >= DAILY_SAFETY_LIMIT and not is_dry_run:
+        print(f"\n⚠️ [DAILY SAFETY CAP REACHED] You have already sent {sent_today} messages today.")
+        print("   To protect your WhatsApp account from being flagged or banned, it is strongly")
+        print("   recommended not to exceed 20-30 cold messages per day on a single number.")
+        override = input("👉 Continue anyway at your own risk? (y/N): ").strip().lower()
+        if override not in ["y", "yes"]:
+            print("[!] Operation paused for account safety. You can resume tomorrow!")
+            return
 
     if pending_count == 0:
         print("\n🎉 All contacts in 'contacts.csv' have already been processed!")
@@ -610,9 +697,9 @@ def main():
     # 4. Load message template
     template = load_message_template()
     sample_contact = pending_contacts[0]
-    sample_msg = format_message(template, sample_contact)
+    sample_msg = format_message(template, sample_contact, safe_link=SAFE_LINK_MODE, soft_opt_out=True)
 
-    print("\n📝 PREVIEW OF PERSONALIZED MESSAGE (First Contact):")
+    print("\n📝 PREVIEW OF PERSONALIZED MESSAGE (First Contact with Spintax & Anti-Ban Hashing):")
     print("=" * 65)
     print(sample_msg)
     print("=" * 65)
@@ -670,8 +757,8 @@ def main():
 
             print(f"[{idx}/{pending_count}] Sending to: {safe_name} ({phone})")
 
-            # Format personalized message
-            msg = format_message(template, row)
+            # Format personalized message with Spintax, zero-width entropy, and soft opt-out
+            msg = format_message(template, row, safe_link=SAFE_LINK_MODE, soft_opt_out=True)
 
             # Send message or simulate in dry-run
             if is_dry_run:
@@ -680,7 +767,7 @@ def main():
                 print(f"    [SIMULATED] Would send to: {safe_name} ({phone})")
                 success_count += 1
             else:
-                success, detail = send_via_selenium(driver, phone, msg)
+                success, detail = send_via_selenium(driver, phone, msg, human_typing=HUMAN_TYPING_MODE)
 
                 if success:
                     log_delivery("SUCCESS", phone, name, detail)
@@ -695,13 +782,17 @@ def main():
                         record_checkpoint(phone, status="invalid")
                     # Temporary failures are not recorded in sent_contacts.txt so they can be retried
 
-            # Anti-ban delay (only if there are more contacts remaining)
+            # Anti-ban delay & Batch cooldown (only if there are more contacts remaining)
             if idx < pending_count:
                 if is_dry_run:
                     print("    ⏳ [Dry-run] Pausing 2s before next simulated lead...\n")
                     time.sleep(2)
                 else:
-                    anti_ban_delay(MIN_DELAY_SECONDS, MAX_DELAY_SECONDS)
+                    # After every BATCH_SIZE messages, take a cooling break
+                    if idx % BATCH_SIZE == 0:
+                        batch_cooldown_pause(BATCH_COOLDOWN_MINUTES)
+                    else:
+                        anti_ban_delay(MIN_DELAY_SECONDS, MAX_DELAY_SECONDS)
 
         print("\n" + "=" * 65)
         print("🎉 WHATSAPP CAMPAIGN COMPLETE")

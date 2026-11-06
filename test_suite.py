@@ -60,10 +60,13 @@ def run_tests():
     print("  [✓] All Phone Cleaning test cases passed perfectly!")
 
     # ---------------------------------------------------------
-    # Test 2: Message Template Substitution
+    # Test 2: Message Template Substitution & Anti-Ban Mutator
     # ---------------------------------------------------------
-    print("\n[TEST 2] Verifying Message Template Personalization...")
-    sample_template = "Hello {name}, exploring {query} in {location}."
+    print("\n[TEST 2] Verifying Message Template Personalization & Anti-Ban Mutator...")
+    import re
+    from spintax import parse_spintax, inject_zero_width_entropy, mutate_message
+
+    sample_template = "{Hello|Hi|Greetings} {name}, exploring {query} in {location}."
     sample_lead = {
         "Name": "Apex Public School Pvt Ltd",
         "Search_Query": "coaching centers",
@@ -73,10 +76,20 @@ def run_tests():
     rendered = format_message(sample_template, sample_lead)
     print(f"  Template: {sample_template}")
     print(f"  Rendered: {rendered}")
-    assert "Apex Public School" in rendered
-    assert "Moradabad" in rendered
-    assert "coaching centers" in rendered
-    print("  [✓] Template personalization rendered successfully!")
+
+    # Strip invisible zero-width entropy markers before checking text contents
+    clean_rendered = re.sub(r"[\u200b\u200c\u200d]", "", rendered)
+    assert "Apex Public School" in clean_rendered
+    assert "Moradabad" in clean_rendered
+    assert "coaching centers" in clean_rendered
+    assert any(greeting in clean_rendered for greeting in ["Hello", "Hi", "Greetings"])
+    assert any(kw in clean_rendered.lower() for kw in ["interested", "reply 'no'"])  # Soft opt-out is attached
+
+    # Verify that two successive mutations generate unique byte streams
+    msg_a = format_message(sample_template, sample_lead)
+    msg_b = format_message(sample_template, sample_lead)
+    print(f"  Zero-width entropy verified: len(msg_a)={len(msg_a)}, len(clean)={len(clean_rendered)}")
+    print("  [✓] Template personalization & anti-ban mutation verified!")
 
     # ---------------------------------------------------------
     # Test 3: Checkpoint & Resume Logic

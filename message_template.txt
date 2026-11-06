@@ -1,13 +1,11 @@
-Hello Sir 👋
+{Hello|Hi|Namaste} {Sir|Ma'am|Team} 👋
 
-Sir, aaj kal students ke paas bade online platforms ka option hai, jahan unhe recorded classes, tests, study materials aur doubt support sab kuch mil jata hai.
+{Sir, aaj kal students ke paas bade online platforms ka option hai|Aaj kal maximum coaching institutes aur educators digital switch kar rahe hain}, jahan unhe recorded classes, tests, study materials aur doubt support sab kuch mil jata hai.
 
 Aise mein, aap apne students ko apne saath long-term kaise jodkar rakhenge? 🤔
 
 ClassYukti ke saath aap apna khud ka branded teaching app bana sakte hain, jahan students aapki classes, tests aur study materials ek hi jagah access kar sakte hain — aapke apne brand ke naam se. 📱
 
-Aur Sir, iske liye aapko koi bada investment karne ki zarurat nahi hai.
+{Aur Sir, iske liye aapko koi bada investment karne ki zarurat nahi hai.|Iske liye aapko koi high cost ya tech team hire karne ki zaroorat nahi hai.}
 
-Kya main aapko iska ek quick demo dikhaun? 😊
-
-🌐 Website: https://classyukti.in
+{Kya main aapko iska ek quick 2-minute demo share karun?|Kya aap iska ek short demo dekhna chahenge?} 😊

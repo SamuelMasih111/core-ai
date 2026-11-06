@@ -189,3 +189,39 @@ Symbols not available. Dumping unresolved backtrace:
 [2026-11-04 18:40:25] [SUCCESS] Phone: 7888698792      | Name: BDS Institute of English  | Simulated successful dispatch (Dry-run mode)
 [2026-11-04 18:40:33] [SUCCESS] Phone: 7988121534      | Name: SMTI | Stock Market Train | Simulated successful dispatch (Dry-run mode)
 [2026-11-04 19:06:25] [SUCCESS] Phone: 8209746456      | Name: Vivekanand coaching class | Message sent successfully
+[2026-11-04 19:08:11] [SUCCESS] Phone: 7231980003      | Name: Power Mind Institute      | Message sent successfully
+[2026-11-04 19:09:34] [SUCCESS] Phone: 6367597967      | Name: Misthi Classes Jaipur     | Message sent successfully
+[2026-11-04 19:11:11] [SUCCESS] Phone: 8619301340      | Name: Guruvidhya career institu | Message sent successfully
+[2026-11-04 19:12:44] [SUCCESS] Phone: 8769463034      | Name: JJ SIR CHEMISTRY INSTITUT | Message sent successfully
+[2026-11-04 19:13:42] [SUCCESS] Phone: 7597252693      | Name: Convex Classes Jaipur | N | Message sent successfully
+[2026-11-04 19:14:42] [SUCCESS] Phone: 9928363295      | Name: Jain Classes              | Message sent successfully
+[2026-11-04 19:15:52] [SUCCESS] Phone: 9983606060      | Name: Paramount Coaching Jaipur | Message sent successfully
+[2026-11-04 19:17:04] [INVALID] Phone: 9829213213      | Name: Utkarsh Classes, Jaipur   | Not registered on WhatsApp
+[2026-11-04 19:18:28] [SUCCESS] Phone: 7014288120      | Name: Advance Coaching Classes  | Message sent successfully
+[2026-11-04 19:19:41] [SUCCESS] Phone: 9828728833      | Name: Neon Classes              | Message sent successfully
+[2026-11-04 19:20:57] [SUCCESS] Phone: 9310463912      | Name: Career Launcher Jaipur Ha | Message sent successfully
+[2026-11-04 19:22:34] [SUCCESS] Phone: 9950034870      | Name: Dhruv Coaching Classes    | Message sent successfully
+[2026-11-04 19:23:25] [SUCCESS] Phone: 9257021072      | Name: Class24 SSC - SSC CGL Exa | Message sent successfully
+[2026-11-04 19:24:24] [SUCCESS] Phone: 9887582200      | Name: Engineers Academy         | Message sent successfully
+[2026-11-04 19:25:34] [SUCCESS] Phone: 7611897930      | Name: Pathshala Classes Jaipur  | Message sent successfully
+[2026-11-04 19:26:21] [SUCCESS] Phone: 9785333312      | Name: LET'S TALK ACADEMY        | Message sent successfully
+[2026-11-04 19:27:50] [SUCCESS] Phone: 9460135100      | Name: Sharma Coaching Jaipur    | Message sent successfully
+[2026-11-04 19:29:31] [SUCCESS] Phone: 9352068139      | Name: Amit Vijay Classes - SSC  | Message sent successfully
+[2026-11-04 19:31:03] [SUCCESS] Phone: 9079797145      | Name: B2E Learning              | Message sent successfully
+[2026-11-04 19:32:39] [INVALID] Phone: 9509283148      | Name: PRIME INSTITUTE For Excel | Not registered on WhatsApp
+[2026-11-04 19:34:11] [SUCCESS] Phone: 8302780664      | Name: MOTHERS PRIDE ACADEMY     | Message sent successfully
+[2026-11-04 19:35:35] [SUCCESS] Phone: 9571262802      | Name: Didactic Institute - Jaip | Message sent successfully
+[2026-11-04 19:37:08] [SUCCESS] Phone: 9680410911      | Name: Sterling Education        | Message sent successfully
+[2026-11-04 19:38:32] [SUCCESS] Phone: 9587224365      | Name: Gurukripa Career Institut | Message sent successfully
+[2026-11-04 19:39:27] [SUCCESS] Phone: 9136887760      | Name: Quanta Institute LLP      | Message sent successfully
+[2026-11-04 19:40:18] [SUCCESS] Phone: 7792826569      | Name: Sparsh Coaching Classes   | Message sent successfully
+[2026-11-04 19:41:48] [SUCCESS] Phone: 9314213544      | Name: Pankaj Coaching Center    | Message sent successfully
+[2026-11-04 19:43:28] [SUCCESS] Phone: 8385888763      | Name: Aspire Coaching classes   | Message sent successfully
+[2026-11-04 19:44:59] [SUCCESS] Phone: 9829050519      | Name: Tomer Classes             | Message sent successfully
+[2026-11-04 19:46:22] [SUCCESS] Phone: 9982222301      | Name: Kautilya Classes, Jaipur  | Message sent successfully
+[2026-11-04 19:48:06] [SUCCESS] Phone: 9667556598      | Name: IDA Classes Jaipur        | Message sent successfully
+[2026-11-04 19:49:17] [FAILED] Phone: 8619126941      | Name: Uttam/Jagrawal Classes    | Send button or chat box did not load within timeout
+[2026-11-04 19:51:09] [FAILED] Phone: 9509059033      | Name: Vishwas English Classes,  | Send button or chat box did not load within timeout
+[2026-11-04 19:52:38] [FAILED] Phone: 9636961534      | Name: The Lakshya Academy       | Send button or chat box did not load within timeout
+[2026-11-04 19:53:47] [FAILED] Phone: 9024839392      | Name: Shubham Coaching Center   | Send button or chat box did not load within timeout
+[2026-11-04 19:55:38] [FAILED] Phone: 9828413517      | Name: Abhivyakti Coaching       | Send button or chat box did not load within timeout

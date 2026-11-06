@@ -42,7 +42,13 @@ if sys.platform.startswith("win"):
 
 # Import core automation helpers
 from scraper import clean_phone_number, is_valid_indian_mobile, create_driver, handle_consent_modal, scroll_feed_to_collect_items, extract_contact_info, save_contacts_to_csv, find_results_feed
-from sender import load_checkpoint, record_checkpoint, log_delivery, load_message_template, format_message, create_whatsapp_driver, wait_for_whatsapp_login, send_via_selenium, send_via_pywhatkit, normalize_whatsapp_phone
+from sender import (
+    load_checkpoint, record_checkpoint, log_delivery, load_message_template,
+    format_message, create_whatsapp_driver, wait_for_whatsapp_login,
+    send_via_selenium, send_via_pywhatkit, normalize_whatsapp_phone,
+    count_messages_sent_today, BATCH_SIZE, BATCH_COOLDOWN_MINUTES,
+    DAILY_SAFETY_LIMIT, HUMAN_TYPING_MODE, SAFE_LINK_MODE
+)
 from blacklist import is_banned_institute, add_banned_institute, get_all_banned_keywords
 import supabase_db
 
@@ -272,8 +278,14 @@ def run_sender_thread(mode: str = "live", min_delay: int = 30, max_delay: int = 
         return
 
     template = load_message_template()
+    sent_today = count_messages_sent_today()
+
     broadcast_log(f"🚀 Starting WhatsApp Campaign ({mode.upper()} MODE) for {total_pending} contacts", "info")
-    broadcast_log(f"🛡️ Anti-ban random delay configured: {min_delay}s - {max_delay}s", "info")
+    broadcast_log(f"🛡️ Anti-ban shield: Random delay {min_delay}s-{max_delay}s | Human typing: {'ON' if HUMAN_TYPING_MODE else 'OFF'}", "info")
+    broadcast_log(f"📊 Daily Health: {sent_today}/{DAILY_SAFETY_LIMIT} sent today | Batch cooldown: Every {BATCH_SIZE} msgs -> {BATCH_COOLDOWN_MINUTES}m break", "info")
+
+    if sent_today >= DAILY_SAFETY_LIMIT and mode == "live":
+        broadcast_log(f"⚠️ [SAFETY WARNING] Daily recommended limit ({DAILY_SAFETY_LIMIT}) reached! Sending more risks automated WhatsApp flags.", "warning")
 
     driver = None
     try:
@@ -327,7 +339,8 @@ def run_sender_thread(mode: str = "live", min_delay: int = 30, max_delay: int = 
                 record_checkpoint(phone, status="invalid")
                 continue
 
-            msg = format_message(template, row)
+            # Format with Spintax, zero-width unique byte entropy, and soft opt-out
+            msg = format_message(template, row, safe_link=SAFE_LINK_MODE, soft_opt_out=True)
             broadcast_log(f"[{idx}/{total_pending}] Sending to: {name} ({phone})...", "info")
 
             if mode == "test":
@@ -335,7 +348,7 @@ def run_sender_thread(mode: str = "live", min_delay: int = 30, max_delay: int = 
                 state["sender"]["success"] += 1
                 broadcast_log(f"    ✓ [SIMULATED TEST] Sent to {name} ({phone})", "info")
             else:
-                success, detail = send_via_selenium(driver, phone, msg)
+                success, detail = send_via_selenium(driver, phone, msg, human_typing=HUMAN_TYPING_MODE)
 
                 if success:
                     state["sender"]["success"] += 1
@@ -351,18 +364,33 @@ def run_sender_thread(mode: str = "live", min_delay: int = 30, max_delay: int = 
                     if is_invalid:
                         record_checkpoint(phone, status="invalid")
 
-            # Anti-ban delay
+            # Anti-ban delay & Batch cooldown
             if idx < total_pending and not sender_stop_event.is_set():
-                delay = random.randint(min_delay, max_delay) if mode == "live" else 2
-                broadcast_log(f"⏳ Anti-ban cooldown: Waiting {delay}s before next message...", "info")
-                state["sender"]["status"] = "pausing"
-                for rem in range(delay, 0, -1):
-                    if sender_stop_event.is_set():
-                        break
-                    state["sender"]["cooldown_remaining"] = rem
-                    time.sleep(1)
-                state["sender"]["cooldown_remaining"] = 0
-                state["sender"]["status"] = "running"
+                if mode == "live" and idx % BATCH_SIZE == 0:
+                    broadcast_log(f"☕ [BATCH COOLING BREAK] Reached {BATCH_SIZE} sends! Pausing for {BATCH_COOLDOWN_MINUTES} minutes to protect WhatsApp health...", "alert")
+                    state["sender"]["status"] = "pausing"
+                    total_break_secs = BATCH_COOLDOWN_MINUTES * 60
+                    for rem in range(total_break_secs, 0, -1):
+                        if sender_stop_event.is_set():
+                            break
+                        state["sender"]["cooldown_remaining"] = rem
+                        if rem % 60 == 0:
+                            broadcast_log(f"☕ Batch cooldown remaining: {rem // 60}m...", "info")
+                        time.sleep(1)
+                    state["sender"]["cooldown_remaining"] = 0
+                    state["sender"]["status"] = "running"
+                    broadcast_log("✓ Batch cooling break finished! Resuming dispatch queue...", "success")
+                else:
+                    delay = random.randint(min_delay, max_delay) if mode == "live" else 1
+                    broadcast_log(f"⏳ Anti-ban cooldown: Waiting {delay}s before next message...", "info")
+                    state["sender"]["status"] = "pausing"
+                    for rem in range(delay, 0, -1):
+                        if sender_stop_event.is_set():
+                            break
+                        state["sender"]["cooldown_remaining"] = rem
+                        time.sleep(1)
+                    state["sender"]["cooldown_remaining"] = 0
+                    state["sender"]["status"] = "running"
 
         broadcast_log("🎉 WhatsApp Campaign finished!", "success")
         state["sender"]["status"] = "finished"
