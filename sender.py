@@ -93,9 +93,11 @@ SESSION_DIR = os.path.join(BASE_DIR, "whatsapp_session")
 # Advanced Anti-Ban Settings
 MIN_DELAY_SECONDS = int(os.getenv("MIN_DELAY_SECONDS", "45"))
 MAX_DELAY_SECONDS = int(os.getenv("MAX_DELAY_SECONDS", "85"))
-BATCH_SIZE = int(os.getenv("BATCH_SIZE", "5"))                         # Messages before taking a long cooling break
-BATCH_COOLDOWN_MINUTES = int(os.getenv("BATCH_COOLDOWN_MINUTES", "5")) # Break duration (minutes)
-DAILY_SAFETY_LIMIT = int(os.getenv("DAILY_SAFETY_LIMIT", "25"))         # Safe daily threshold per WhatsApp number
+BATCH_SIZE = int(os.getenv("BATCH_SIZE", "5"))                                                    # Messages before taking a long cooling break
+BATCH_COOLDOWN_MIN_MINUTES = int(os.getenv("BATCH_COOLDOWN_MIN_MINUTES", os.getenv("BATCH_COOLDOWN_MINUTES", "5"))) # Min break duration (minutes)
+BATCH_COOLDOWN_MAX_MINUTES = int(os.getenv("BATCH_COOLDOWN_MAX_MINUTES", "10"))                  # Max break duration (minutes)
+BATCH_COOLDOWN_MINUTES = BATCH_COOLDOWN_MIN_MINUTES                                              # Backward compatibility alias
+DAILY_SAFETY_LIMIT = int(os.getenv("DAILY_SAFETY_LIMIT", "25"))                                    # Safe daily threshold per WhatsApp number
 HUMAN_TYPING_MODE = os.getenv("HUMAN_TYPING_MODE", "true").lower() in ["true", "1", "yes"]
 SAFE_LINK_MODE = os.getenv("SAFE_LINK_MODE", "true").lower() in ["true", "1", "yes"]
 
@@ -244,13 +246,22 @@ def anti_ban_delay(min_s: int = MIN_DELAY_SECONDS, max_s: int = MAX_DELAY_SECOND
     print("    [✓] Cooldown finished. Resuming queue...                  \n")
 
 
-def batch_cooldown_pause(minutes: int = BATCH_COOLDOWN_MINUTES) -> None:
+def batch_cooldown_pause(
+    min_minutes: int = BATCH_COOLDOWN_MIN_MINUTES,
+    max_minutes: int = BATCH_COOLDOWN_MAX_MINUTES
+) -> None:
     """
-    Pauses execution for a cooling break (e.g. 5 minutes) after sending a batch of messages.
-    Crucial to prevent WhatsApp telemetry from detecting continuous robot patterns.
+    Pauses execution for a randomized cooling break (between 5 and 10 minutes by default)
+    after sending a batch of messages. Crucial to prevent WhatsApp telemetry from
+    detecting predictable, robotic patterns.
     """
-    total_seconds = minutes * 60
-    print(f"\n[☕ BATCH COOLING BREAK] Taking a {minutes}-minute rest to protect your WhatsApp account health...")
+    if min_minutes > max_minutes:
+        min_minutes, max_minutes = max_minutes, min_minutes
+
+    total_seconds = random.randint(min_minutes * 60, max_minutes * 60)
+    minutes_display = round(total_seconds / 60, 1)
+
+    print(f"\n[☕ BATCH COOLING BREAK] Taking a randomized {minutes_display}-minute rest ({min_minutes}-{max_minutes}m range) to protect your WhatsApp account health...")
     for rem in range(total_seconds, 0, -1):
         m, s = divmod(rem, 60)
         print(f"    ⏳ Account resting... {m:02d}:{s:02d} remaining [Batch safety cooldown]", end="\r")
@@ -675,7 +686,7 @@ def main():
     print(f"   • Human typing simulation:        {'ACTIVE (Evades bot telemetry)' if HUMAN_TYPING_MODE else 'OFF'}")
     print(f"   • Spintax & unique hash entropy:  ACTIVE (Unique SHA-256 hash per dispatch)")
     print(f"   • Randomized delay range:         {MIN_DELAY_SECONDS} to {MAX_DELAY_SECONDS} seconds")
-    print(f"   • Batch cooling break:            Every {BATCH_SIZE} sends -> {BATCH_COOLDOWN_MINUTES} min pause")
+    print(f"   • Batch cooling break:            Every {BATCH_SIZE} sends -> {BATCH_COOLDOWN_MIN_MINUTES}-{BATCH_COOLDOWN_MAX_MINUTES} min randomized pause")
     print(f"   • Delivery log output:            {os.path.abspath(LOG_FILE)}")
     print(f"   • Session storage path:           {SESSION_DIR}")
     print("-" * 65)
@@ -788,9 +799,9 @@ def main():
                     print("    ⏳ [Dry-run] Pausing 2s before next simulated lead...\n")
                     time.sleep(2)
                 else:
-                    # After every BATCH_SIZE messages, take a cooling break
+                    # After every BATCH_SIZE messages, take a randomized cooling break (5-10 min)
                     if idx % BATCH_SIZE == 0:
-                        batch_cooldown_pause(BATCH_COOLDOWN_MINUTES)
+                        batch_cooldown_pause(BATCH_COOLDOWN_MIN_MINUTES, BATCH_COOLDOWN_MAX_MINUTES)
                     else:
                         anti_ban_delay(MIN_DELAY_SECONDS, MAX_DELAY_SECONDS)
 

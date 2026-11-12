@@ -47,6 +47,7 @@ from sender import (
     format_message, create_whatsapp_driver, wait_for_whatsapp_login,
     send_via_selenium, send_via_pywhatkit, normalize_whatsapp_phone,
     count_messages_sent_today, BATCH_SIZE, BATCH_COOLDOWN_MINUTES,
+    BATCH_COOLDOWN_MIN_MINUTES, BATCH_COOLDOWN_MAX_MINUTES,
     DAILY_SAFETY_LIMIT, HUMAN_TYPING_MODE, SAFE_LINK_MODE
 )
 from blacklist import is_banned_institute, add_banned_institute, get_all_banned_keywords
@@ -282,7 +283,7 @@ def run_sender_thread(mode: str = "live", min_delay: int = 30, max_delay: int = 
 
     broadcast_log(f"🚀 Starting WhatsApp Campaign ({mode.upper()} MODE) for {total_pending} contacts", "info")
     broadcast_log(f"🛡️ Anti-ban shield: Random delay {min_delay}s-{max_delay}s | Human typing: {'ON' if HUMAN_TYPING_MODE else 'OFF'}", "info")
-    broadcast_log(f"📊 Daily Health: {sent_today}/{DAILY_SAFETY_LIMIT} sent today | Batch cooldown: Every {BATCH_SIZE} msgs -> {BATCH_COOLDOWN_MINUTES}m break", "info")
+    broadcast_log(f"📊 Daily Health: {sent_today}/{DAILY_SAFETY_LIMIT} sent today | Batch cooldown: Every {BATCH_SIZE} msgs -> {BATCH_COOLDOWN_MIN_MINUTES}-{BATCH_COOLDOWN_MAX_MINUTES}m random break", "info")
 
     if sent_today >= DAILY_SAFETY_LIMIT and mode == "live":
         broadcast_log(f"⚠️ [SAFETY WARNING] Daily recommended limit ({DAILY_SAFETY_LIMIT}) reached! Sending more risks automated WhatsApp flags.", "warning")
@@ -367,9 +368,13 @@ def run_sender_thread(mode: str = "live", min_delay: int = 30, max_delay: int = 
             # Anti-ban delay & Batch cooldown
             if idx < total_pending and not sender_stop_event.is_set():
                 if mode == "live" and idx % BATCH_SIZE == 0:
-                    broadcast_log(f"☕ [BATCH COOLING BREAK] Reached {BATCH_SIZE} sends! Pausing for {BATCH_COOLDOWN_MINUTES} minutes to protect WhatsApp health...", "alert")
+                    total_break_secs = random.randint(BATCH_COOLDOWN_MIN_MINUTES * 60, BATCH_COOLDOWN_MAX_MINUTES * 60)
+                    break_mins_display = round(total_break_secs / 60, 1)
+                    broadcast_log(
+                        f"☕ [BATCH COOLING BREAK] Reached {BATCH_SIZE} sends! Pausing for randomized {break_mins_display} minutes ({BATCH_COOLDOWN_MIN_MINUTES}-{BATCH_COOLDOWN_MAX_MINUTES}m range) to protect WhatsApp health...",
+                        "alert"
+                    )
                     state["sender"]["status"] = "pausing"
-                    total_break_secs = BATCH_COOLDOWN_MINUTES * 60
                     for rem in range(total_break_secs, 0, -1):
                         if sender_stop_event.is_set():
                             break

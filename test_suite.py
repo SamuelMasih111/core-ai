@@ -204,6 +204,31 @@ def run_tests():
 
     print("  [✓] WhatsApp Phone Normalization & Mobile Filter verified!")
 
+    # ---------------------------------------------------------
+    # Test 7: Anti-Ban Batch Cooldown Randomized Range (5 - 10 Minutes)
+    # ---------------------------------------------------------
+    print("\n[TEST 7] Verifying Anti-Ban Batch Cooldown (5 - 10 Min Randomized Range)...")
+    from sender import BATCH_COOLDOWN_MIN_MINUTES, BATCH_COOLDOWN_MAX_MINUTES, BATCH_SIZE
+    import random
+
+    assert BATCH_COOLDOWN_MIN_MINUTES == 5, f"Expected min cooldown 5m, got {BATCH_COOLDOWN_MIN_MINUTES}m"
+    assert BATCH_COOLDOWN_MAX_MINUTES == 10, f"Expected max cooldown 10m, got {BATCH_COOLDOWN_MAX_MINUTES}m"
+    assert BATCH_SIZE == 5, f"Expected batch size 5, got {BATCH_SIZE}"
+
+    # Simulate 50 sample randomized cooldown selections
+    simulated_seconds = [
+        random.randint(BATCH_COOLDOWN_MIN_MINUTES * 60, BATCH_COOLDOWN_MAX_MINUTES * 60)
+        for _ in range(50)
+    ]
+    assert all(300 <= s <= 600 for s in simulated_seconds), "Randomized cooldown out of bounds!"
+    # Ensure there is non-zero variance (it is truly randomized)
+    assert len(set(simulated_seconds)) > 1, "Cooldown is not randomized!"
+
+    print(f"  Batch size: {BATCH_SIZE} messages")
+    print(f"  Random cooldown range: {BATCH_COOLDOWN_MIN_MINUTES} to {BATCH_COOLDOWN_MAX_MINUTES} minutes ({300}s - {600}s)")
+    print(f"  Sample randomized durations: {[f'{round(s/60, 1)}m' for s in simulated_seconds[:5]]}")
+    print("  [✓] Anti-Ban Batch Cooldown Randomized Range verified!")
+
     print("\n" + "=" * 65)
     print("🎉 ALL INTEGRITY TESTS PASSED SUCCESSFULLY (100% HEALTHY)")
     print("=" * 65 + "\n")

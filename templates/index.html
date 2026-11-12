@@ -86,7 +86,7 @@
         <div class="kpi-info">
           <span class="kpi-title">Anti-Ban Protection</span>
           <h3 class="kpi-value text-purple" id="kpi-anti-ban">Active</h3>
-          <span class="kpi-sub">30s - 60s randomized pause</span>
+          <span class="kpi-sub">Human typing & 5-10m cooling</span>
         </div>
         <div class="kpi-icon icon-purple">
           <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -244,17 +244,17 @@
             <div class="input-row">
               <div class="input-group">
                 <label for="sender-min-delay">Min Delay (Seconds)</label>
-                <input type="number" id="sender-min-delay" min="15" max="60" value="30">
+                <input type="number" id="sender-min-delay" min="15" max="90" value="45">
               </div>
               <div class="input-group">
                 <label for="sender-max-delay">Max Delay (Seconds)</label>
-                <input type="number" id="sender-max-delay" min="30" max="120" value="60">
+                <input type="number" id="sender-max-delay" min="45" max="180" value="85">
               </div>
             </div>
 
             <div class="notice-box notice-purple">
               <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              <span><b>Anti-Ban Active:</b> Random delay of 30-60s simulates human typing. Uses your saved session in <code>whatsapp_session/</code> (QR scan needed only once).</span>
+              <span><b>Anti-Ban Shield:</b> Randomized delays (45-85s), human keystroke typing, unique byte hashing, and randomized 5-10 min batch cooling breaks. Uses saved session in <code>whatsapp_session/</code>.</span>
             </div>
 
             <div class="action-row">
