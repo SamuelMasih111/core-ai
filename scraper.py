@@ -142,9 +142,41 @@ def is_valid_indian_mobile(phone: str | None) -> bool:
 # ==============================================================================
 # BROWSER DRIVER INITIALIZATION
 # ==============================================================================
+def find_working_chromedriver_service() -> Service | None:
+    """
+    Discovers an unblocked, functional chromedriver executable.
+    Protects against Windows 11 Smart App Control (SAC) [WinError 4551] by validating
+    execution permissions on cached or system drivers before launching Chrome.
+    """
+    import glob
+    import subprocess
+
+    cache_dir = os.path.expanduser(r"~/.cache/selenium/chromedriver/win64")
+    if os.path.exists(cache_dir):
+        candidates = sorted(glob.glob(os.path.join(cache_dir, "*", "chromedriver.exe")), reverse=True)
+        for candidate in candidates:
+            try:
+                res = subprocess.run([candidate, "--version"], capture_output=True, text=True, timeout=2)
+                if res.returncode == 0:
+                    return Service(executable_path=candidate)
+            except Exception:
+                continue
+
+    for candidate in ["chromedriver", "chromedriver.exe"]:
+        try:
+            res = subprocess.run([candidate, "--version"], capture_output=True, text=True, timeout=2)
+            if res.returncode == 0:
+                return Service(executable_path=candidate)
+        except Exception:
+            continue
+
+    return None
+
+
 def create_driver(headless: bool = False):
     """
     Configures and initializes Chrome WebDriver with anti-detection flags.
+    Falls back gracefully to Microsoft Edge if Windows Smart App Control blocks ChromeDriver.
     """
     if not HAS_SELENIUM:
         raise ImportError(
@@ -175,22 +207,50 @@ def create_driver(headless: bool = False):
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option("useAutomationExtension", False)
 
-    try:
-        # Modern Selenium 4 Manager handles driver automatically
-        driver = webdriver.Chrome(options=options)
-    except Exception as e:
-        print(f"[i] Selenium Manager encountered: {e}. Trying webdriver-manager fallback...")
-        if USE_WDM:
-            service = Service(ChromeDriverManager().install())
+    driver = None
+
+    # Strategy 1: Check for verified, unblocked cached ChromeDriver (bypasses WinError 4551)
+    service = find_working_chromedriver_service()
+    if service:
+        try:
             driver = webdriver.Chrome(service=service, options=options)
-        else:
-            raise
+        except Exception as e:
+            print(f"[i] Pre-verified ChromeDriver encountered {e}. Trying default Selenium Manager...")
+
+    # Strategy 2: Default Selenium 4 Manager
+    if not driver:
+        try:
+            driver = webdriver.Chrome(options=options)
+        except Exception as e:
+            print(f"[i] Chrome launch encountered: {e}. Trying webdriver-manager...")
+            if USE_WDM:
+                try:
+                    wdm_service = Service(ChromeDriverManager().install())
+                    driver = webdriver.Chrome(service=wdm_service, options=options)
+                except Exception:
+                    pass
+
+    # Strategy 3: Microsoft Edge Fallback (Always signed by Microsoft, immune to Smart App Control)
+    if not driver:
+        print("[i] Chrome blocked by system application policy. Initializing Microsoft Edge fallback...")
+        from selenium.webdriver.edge.options import Options as EdgeOptions
+        edge_options = EdgeOptions()
+        if headless:
+            edge_options.add_argument("--headless=new")
+        edge_options.add_argument("--start-maximized")
+        edge_options.add_argument("--disable-blink-features=AutomationControlled")
+        edge_options.add_argument("--disable-notifications")
+        driver = webdriver.Edge(options=edge_options)
 
     # Override navigator.webdriver
-    driver.execute_cdp_cmd(
-        "Page.addScriptToEvaluateOnNewDocument",
-        {"source": "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"}
-    )
+    try:
+        driver.execute_cdp_cmd(
+            "Page.addScriptToEvaluateOnNewDocument",
+            {"source": "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"}
+        )
+    except Exception:
+        pass
+
     return driver
 
 

@@ -51,6 +51,7 @@ from blacklist import is_banned_institute
 
 # Spintax and anti-ban message mutator
 from spintax import mutate_message, parse_spintax
+from scraper import find_working_chromedriver_service
 
 try:
     from selenium import webdriver
@@ -317,39 +318,59 @@ def create_whatsapp_driver(session_path: str = SESSION_DIR):
         return options
 
     driver = None
-    try:
-        driver = webdriver.Chrome(options=_build_options(session_path))
-    except Exception as first_err:
-        print(f"[i] Primary Chrome startup encountered: {first_err}. Attempting profile lock purge and recovery...")
-        # Purge locks inside Default subfolder
-        default_dir = os.path.join(session_path, "Default")
-        if os.path.exists(default_dir):
-            for lock_candidate in ["LOCK", "LOCK-journal", "LOG", "LOG.old"]:
-                fpath = os.path.join(default_dir, lock_candidate)
-                if os.path.exists(fpath):
+    # Strategy 1: Check for verified, unblocked cached ChromeDriver (bypasses WinError 4551 from Smart App Control)
+    service = find_working_chromedriver_service()
+    if service:
+        try:
+            driver = webdriver.Chrome(service=service, options=_build_options(session_path))
+        except Exception as first_err:
+            print(f"[i] Pre-verified service encountered: {first_err}. Attempting profile lock purge and recovery...")
+
+    if not driver:
+        try:
+            driver = webdriver.Chrome(options=_build_options(session_path))
+        except Exception as first_err:
+            print(f"[i] Primary Chrome startup encountered: {first_err}. Attempting profile lock purge and recovery...")
+            # Purge locks inside Default subfolder
+            default_dir = os.path.join(session_path, "Default")
+            if os.path.exists(default_dir):
+                for lock_candidate in ["LOCK", "LOCK-journal", "LOG", "LOG.old"]:
+                    fpath = os.path.join(default_dir, lock_candidate)
+                    if os.path.exists(fpath):
+                        try:
+                            os.remove(fpath)
+                        except Exception:
+                            pass
+            
+            try:
+                if USE_WDM:
+                    service = Service(ChromeDriverManager().install())
+                    driver = webdriver.Chrome(service=service, options=_build_options(session_path))
+                else:
+                    driver = webdriver.Chrome(options=_build_options(session_path))
+            except Exception:
+                # If Chrome is blocked by Smart App Control, try Microsoft Edge fallback
+                try:
+                    from selenium.webdriver.edge.options import Options as EdgeOptions
+                    edge_options = EdgeOptions()
+                    edge_options.add_argument(f"--user-data-dir={session_path}")
+                    edge_options.add_argument("--start-maximized")
+                    edge_options.add_argument("--window-size=1200,900")
+                    edge_options.add_argument("--disable-blink-features=AutomationControlled")
+                    edge_options.add_argument("--disable-notifications")
+                    driver = webdriver.Edge(options=edge_options)
+                except Exception:
+                    # If still failing, profile directory was critically corrupted. Recreate cleanly.
+                    import shutil
+                    backup_path = session_path + "_corrupt_backup"
                     try:
-                        os.remove(fpath)
+                        if os.path.exists(backup_path):
+                            shutil.rmtree(backup_path, ignore_errors=True)
+                        shutil.move(session_path, backup_path)
                     except Exception:
                         pass
-        
-        try:
-            if USE_WDM:
-                service = Service(ChromeDriverManager().install())
-                driver = webdriver.Chrome(service=service, options=_build_options(session_path))
-            else:
-                driver = webdriver.Chrome(options=_build_options(session_path))
-        except Exception:
-            # If still failing, profile directory was critically corrupted. Recreate cleanly.
-            import shutil
-            backup_path = session_path + "_corrupt_backup"
-            try:
-                if os.path.exists(backup_path):
-                    shutil.rmtree(backup_path, ignore_errors=True)
-                shutil.move(session_path, backup_path)
-            except Exception:
-                pass
-            os.makedirs(session_path, exist_ok=True)
-            driver = webdriver.Chrome(options=_build_options(session_path))
+                    os.makedirs(session_path, exist_ok=True)
+                    driver = webdriver.Chrome(options=_build_options(session_path))
 
     try:
         driver.switch_to.window(driver.current_window_handle)
