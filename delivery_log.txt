@@ -225,3 +225,230 @@ Symbols not available. Dumping unresolved backtrace:
 [2026-11-04 19:52:38] [FAILED] Phone: 9636961534      | Name: The Lakshya Academy       | Send button or chat box did not load within timeout
 [2026-11-04 19:53:47] [FAILED] Phone: 9024839392      | Name: Shubham Coaching Center   | Send button or chat box did not load within timeout
 [2026-11-04 19:55:38] [FAILED] Phone: 9828413517      | Name: Abhivyakti Coaching       | Send button or chat box did not load within timeout
+[2026-11-06 10:19:54] [SUCCESS] Phone: 9030030185      | Name: Everest Coaching Point    | Message sent successfully
+[2026-11-06 10:20:55] [INVALID] Phone: 9533200400      | Name: IACE                      | Not registered on WhatsApp
+[2026-11-06 10:23:36] [SUCCESS] Phone: 9908885639      | Name: Sri Netaji Study Circle   | Message sent successfully
+[2026-11-06 10:24:46] [INVALID] Phone: 9908470999      | Name: Vijetha Study Circle      | Not registered on WhatsApp
+[2026-11-06 10:27:36] [SUCCESS] Phone: 9959750006      | Name: MAD SCHOOL Hyderabad - NI | Message sent successfully
+[2026-11-06 10:34:00] [SUCCESS] Phone: 7306866766      | Name: Ujwala Academy            | Message sent successfully
+[2026-11-06 10:35:14] [INVALID] Phone: 9515487979      | Name: AKS IAS Academy           | Not registered on WhatsApp
+[2026-11-06 10:37:50] [SUCCESS] Phone: 8500233433      | Name: Career Power              | Message sent successfully
+[2026-11-06 10:40:02] [SUCCESS] Phone: 8143352352      | Name: SREE ACADEMY JEE MAINS EC | Message sent successfully
+[2026-11-06 10:42:34] [SUCCESS] Phone: 9246212138      | Name: SAIMEDHA KOTI             | Message sent successfully
+[2026-11-06 10:48:59] [SUCCESS] Phone: 9052292929      | Name: La Excellence IAS Academy | Message sent successfully
+[2026-11-06 10:50:38] [INVALID] Phone: 7680887722      | Name: Sreedhar's CCE - Bank/SSC | Not registered on WhatsApp
+[2026-11-06 10:53:01] [SUCCESS] Phone: 9849506649      | Name: Sri Medha Center for Comp | Message sent successfully
+[2026-11-06 10:55:41] [SUCCESS] Phone: 7032813578      | Name: VMR Logics                | Message sent successfully
+[2026-11-06 10:57:38] [SUCCESS] Phone: 8980757598      | Name: BRDS Hyderabad            | Message sent successfully
+[2026-11-06 11:04:03] [SUCCESS] Phone: 9311740410      | Name: Forum Learning Center - H | Message sent successfully
+[2026-11-06 11:06:42] [SUCCESS] Phone: 8885555202      | Name: Ramaiah Competitive Coach | Message sent successfully
+[2026-11-06 11:07:53] [FAILED] Phone: 9247700377      | Name: Digvijay Coaching Centre  | Unexpected error: Message: element not interactable
+  (Session info: chrome=156.0.8078.80); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#elementnotinteractableexception
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	(No symbol) [0x7ff7ad4fbe65]
+	(No symbol) [0x7ff7ad4035f0]
+	(No symbol) [0x7ff7ad7f1dad]
+	(No symbol) [0x7ff7ada78ecc]
+	(No symbol) [0x7ff7ada7823b]
+	(No symbol) [0x7ff7ada907da]
+	(No symbol) [0x7ff7ada73b39]
+	(No symbol) [0x7ff7ada73ad0]
+	(No symbol) [0x7ff7ad2a6661]
+	(No symbol) [0x7ff7ad28b969]
+	(No symbol) [0x7ff7ad28cca3]
+	(No symbol) [0x7ff7ad975af1]
+	(No symbol) [0x7ff7ad9967f7]
+	(No symbol) [0x7ff7ad98ce20]
+	(No symbol) [0x7ff7ad61ff8e]
+	(No symbol) [0x7ff7ad412865]
+	(No symbol) [0x7ff7ad40d1d4]
+	(No symbol) [0x7ff7ad40d364]
+	(No symbol) [0x7ff7ad3f644c]
+	(No symbol) [0x7fffe3a8dda7]
+	(No symbol) [0x7fffe44f9c5c]
+
+[2026-11-06 11:09:24] [FAILED] Phone: 9052220303      | Name: AVR COACHING              | Unexpected error: Message: stale element reference: stale element not found in the current frame
+  (Session info: chrome=156.0.8078.80); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#staleelementreferenceexception
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	(No symbol) [0x7ff7ad4fbe65]
+	(No symbol) [0x7ff7ad4035f0]
+	(No symbol) [0x7ff7ad2726d3]
+	(No symbol) [0x7ff7ad275af0]
+	(No symbol) [0x7ff7ada4e2a0]
+	(No symbol) [0x7ff7ada4e40f]
+	(No symbol) [0x7ff7ada7e914]
+	(No symbol) [0x7ff7ada7e7f9]
+	(No symbol) [0x7ff7ada7e9bf]
+	(No symbol) [0x7ff7ada76a65]
+	(No symbol) [0x7ff7ada907da]
+	(No symbol) [0x7ff7ada73b39]
+	(No symbol) [0x7ff7ada73ad0]
+	(No symbol) [0x7ff7ad2a6661]
+	(No symbol) [0x7ff7ad28b969]
+	(No symbol) [0x7ff7ad28cca3]
+	(No symbol) [0x7ff7ad975af1]
+	(No symbol) [0x7ff7ad9967f7]
+	(No symbol) [0x7ff7ad98ce20]
+	(No symbol) [0x7ff7ad61ff8e]
+	(No symbol) [0x7ff7ad412865]
+	(No symbol) [0x7ff7ad40d1d4]
+	(No symbol) [0x7ff7ad40d364]
+	(No symbol) [0x7ff7ad3f644c]
+	(No symbol) [0x7fffe3a8dda7]
+	(No symbol) [0x7fffe44f9c5c]
+
+[2026-11-06 11:11:44] [SUCCESS] Phone: 9313218048      | Name: Chahal Academy            | Message sent successfully
+[2026-11-06 11:16:54] [INVALID] Phone: 7290068509      | Name: MADE EASY, Hyderabad Cent | Not registered on WhatsApp
+[2026-11-06 11:18:00] [FAILED] Phone: 9492992012      | Name: Golconda Institute        | Send button or chat box did not load within timeout
+[2026-11-06 11:20:45] [FAILED] Phone: 9247700377      | Name: Digvijay Coaching Centre  | Unexpected error: Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	(No symbol) [0x7ff7ad4fbe65]
+	(No symbol) [0x7ff7ad4035f0]
+	(No symbol) [0x7ff7ad7f1dad]
+	(No symbol) [0x7ff7ad28c45d]
+	(No symbol) [0x7ff7ad28cca3]
+	(No symbol) [0x7ff7ad975af1]
+	(No symbol) [0x7ff7ad9967f7]
+	(No symbol) [0x7ff7ad98ce20]
+	(No symbol) [0x7ff7ad61ff8e]
+	(No symbol) [0x7ff7ad412865]
+	(No symbol) [0x7ff7ad40d1d4]
+	(No symbol) [0x7ff7ad40d364]
+	(No symbol) [0x7ff7ad3f644c]
+	(No symbol) [0x7fffe3a8dda7]
+	(No symbol) [0x7fffe44f9c5c]
+
+[2026-11-06 11:22:17] [SUCCESS] Phone: 9247700377      | Name: Digvijay Coaching Centre  | Message sent successfully
+[2026-11-06 11:23:32] [FAILED] Phone: 9052220303      | Name: AVR COACHING              | Unexpected error: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=156.0.8078.80)
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	(No symbol) [0x7ff7ad4fbe65]
+	(No symbol) [0x7ff7ad4035f0]
+	(No symbol) [0x7ff7ad2726d3]
+	(No symbol) [0x7ff7ad260350]
+	(No symbol) [0x7ff7ad2a1f96]
+	(No symbol) [0x7ff7ad2a639f]
+	(No symbol) [0x7ff7ad28b969]
+	(No symbol) [0x7ff7ad28cca3]
+	(No symbol) [0x7ff7ad975af1]
+	(No symbol) [0x7ff7ad9967f7]
+	(No symbol) [0x7ff7ad98ce20]
+	(No symbol) [0x7ff7ad61ff8e]
+	(No symbol) [0x7ff7ad412865]
+	(No symbol) [0x7ff7ad40d1d4]
+	(No symbol) [0x7ff7ad40d364]
+	(No symbol) [0x7ff7ad3f644c]
+	(No symbol) [0x7fffe3a8dda7]
+	(No symbol) [0x7fffe44f9c5c]
+
+[2026-11-06 11:26:52] [SUCCESS] Phone: 9891868595      | Name: Career Launcher Ghaziabad | Message sent successfully
+[2026-11-06 11:29:07] [SUCCESS] Phone: 9811223820      | Name: Career Power Ghaziabad    | Message sent successfully
+[2026-11-06 11:31:15] [SUCCESS] Phone: 7840058009      | Name: Perfect Academy           | Message sent successfully
+[2026-11-06 11:33:57] [SUCCESS] Phone: 9266885466      | Name: Rankify Academy           | Message sent successfully
+[2026-11-06 11:36:51] [SUCCESS] Phone: 7290004250      | Name: IMS Coaching RDC Rajnagar | Message sent successfully
+[2026-11-06 11:43:13] [SUCCESS] Phone: 8588030766      | Name: Maths Guru Academy        | Message sent successfully
+[2026-11-06 11:45:17] [SUCCESS] Phone: 9811222991      | Name: VIDYA JYOTI THE INSTITUTE | Message sent successfully
+[2026-11-06 11:47:59] [SUCCESS] Phone: 8375060247      | Name: अcademica Institute       | Message sent successfully
+[2026-11-06 11:50:55] [SUCCESS] Phone: 7428394519      | Name: SD CAMPUS                 | Message sent successfully
+[2026-11-06 11:53:17] [SUCCESS] Phone: 9654108195      | Name: Achievers IAS Academy- IA | Message sent successfully
+[2026-11-06 11:59:37] [SUCCESS] Phone: 9928699858      | Name: Kremlin classes Pvt Ltd   | Message sent successfully
+[2026-11-06 12:02:06] [SUCCESS] Phone: 9643625893      | Name: Rishabh Thakur Classes- B | Message sent successfully
+[2026-11-06 12:04:49] [SUCCESS] Phone: 9953511934      | Name: Study Point IAS, PCS Coac | Message sent successfully
+[2026-11-06 12:07:21] [SUCCESS] Phone: 8745929967      | Name: Indo Academy | Spoken Eng | Message sent successfully
+[2026-11-06 12:09:41] [SUCCESS] Phone: 9999761600      | Name: PACE IIT & Medical        | Message sent successfully
+[2026-11-06 12:16:05] [SUCCESS] Phone: 7982001673      | Name: Ojha Coaching Centre      | Message sent successfully
+[2026-11-06 12:18:52] [SUCCESS] Phone: 8800519046      | Name: Dynamic coaching classes  | Message sent successfully
+[2026-11-06 12:21:40] [SUCCESS] Phone: 9891015544      | Name: Deep IAS Coaching & Free  | Message sent successfully
+[2026-11-06 12:22:29] [INVALID] Phone: 9650306414      | Name: AGRIM ACADEMY             | Not registered on WhatsApp
+[2026-11-06 12:24:59] [SUCCESS] Phone: 9811806152      | Name: Lalit Coaching Centre     | Message sent successfully
+[2026-11-11 10:40:51] [SUCCESS] Phone: 8307191280      | Name: ICS GS Coaching Centre    | Message sent successfully
+[2026-11-11 10:42:37] [FAILED] Phone: 7231980003      | Name: Power Mind Institute      | Send button or chat box did not load within timeout
+[2026-11-11 10:47:37] [FAILED] Phone: 7231980003      | Name: Power Mind Institute      | Unexpected error: Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	(No symbol) [0x7ff7e4809cf5]
+	(No symbol) [0x7ff7e4709540]
+	(No symbol) [0x7ff7e4b0431d]
+	(No symbol) [0x7ff7e45abc44]
+	(No symbol) [0x7ff7e45ac6b3]
+	(No symbol) [0x7ff7e4cd52e1]
+	(No symbol) [0x7ff7e4cfc54b]
+	(No symbol) [0x7ff7e4cf0c00]
+	(No symbol) [0x7ff7e4932f3e]
+	(No symbol) [0x7ff7e4718d85]
+	(No symbol) [0x7ff7e4713424]
+	(No symbol) [0x7ff7e47135b4]
+	(No symbol) [0x7ff7e46fc7ec]
+	(No symbol) [0x7ff879e0dda7]
+	(No symbol) [0x7ff87b599c5c]
+
+[2026-11-11 10:48:32] [FAILED] Phone: 9828728833      | Name: Neon Classes              | Unexpected error: Message: stale element reference: stale element not found in the current frame
+  (Session info: chrome=157.0.8103.39); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#staleelementreferenceexception
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	(No symbol) [0x7ff7e4809cf5]
+	(No symbol) [0x7ff7e4709540]
+	(No symbol) [0x7ff7e4592763]
+	(No symbol) [0x7ff7e4595b90]
+	(No symbol) [0x7ff7e4dbea50]
+	(No symbol) [0x7ff7e4dbebbf]
+	(No symbol) [0x7ff7e4def604]
+	(No symbol) [0x7ff7e4def4e9]
+	(No symbol) [0x7ff7e4def6af]
+	(No symbol) [0x7ff7e4de7755]
+	(No symbol) [0x7ff7e4e014ca]
+	(No symbol) [0x7ff7e4de4829]
+	(No symbol) [0x7ff7e4de47c0]
+	(No symbol) [0x7ff7e45c5481]
+	(No symbol) [0x7ff7e45ab389]
+	(No symbol) [0x7ff7e45ac6b3]
+	(No symbol) [0x7ff7e4cd52e1]
+	(No symbol) [0x7ff7e4cfc54b]
+	(No symbol) [0x7ff7e4cf0c00]
+	(No symbol) [0x7ff7e4932f3e]
+	(No symbol) [0x7ff7e4718d85]
+	(No symbol) [0x7ff7e4713424]
+	(No symbol) [0x7ff7e47135b4]
+	(No symbol) [0x7ff7e46fc7ec]
+	(No symbol) [0x7ff879e0dda7]
+	(No symbol) [0x7ff87b599c5c]
+
+[2026-11-11 10:49:20] [FAILED] Phone: 9928363295      | Name: Jain Classes              | Unexpected error: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=157.0.8103.39)
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	(No symbol) [0x7ff7e4809cf5]
+	(No symbol) [0x7ff7e4709540]
+	(No symbol) [0x7ff7e4592763]
+	(No symbol) [0x7ff7e45804a0]
+	(No symbol) [0x7ff7e45c0f06]
+	(No symbol) [0x7ff7e45c51bf]
+	(No symbol) [0x7ff7e45ab389]
+	(No symbol) [0x7ff7e45ac6b3]
+	(No symbol) [0x7ff7e4cd52e1]
+	(No symbol) [0x7ff7e4cfc54b]
+	(No symbol) [0x7ff7e4cf0c00]
+	(No symbol) [0x7ff7e4932f3e]
+	(No symbol) [0x7ff7e4718d85]
+	(No symbol) [0x7ff7e4713424]
+	(No symbol) [0x7ff7e47135b4]
+	(No symbol) [0x7ff7e46fc7ec]
+	(No symbol) [0x7ff879e0dda7]
+	(No symbol) [0x7ff87b599c5c]
+
+[2026-11-11 11:03:41] [SUCCESS] Phone: 9820279050      | Name: Babu Sir's Group Tuitions | Message sent successfully
+[2026-11-11 11:05:56] [SUCCESS] Phone: 7700008850      | Name: STUDY CAMPUS              | Message sent successfully
+[2026-11-11 11:07:49] [SUCCESS] Phone: 8433932283      | Name: SILICA Andheri            | Message sent successfully
+[2026-11-11 11:09:28] [INVALID] Phone: 9355001499      | Name: IBOP Academy              | Not registered on WhatsApp
+[2026-11-11 11:12:15] [SUCCESS] Phone: 7273895895      | Name: Ednovate Andheri Branch | | Message sent successfully
+[2026-11-11 11:18:33] [SUCCESS] Phone: 8928155218      | Name: Active Learners Academy   | Message sent successfully
+[2026-11-11 11:19:39] [INVALID] Phone: 8655066640      | Name: T.I.M.E. Andheri          | Not registered on WhatsApp
+[2026-11-11 11:21:44] [SUCCESS] Phone: 9637551234      | Name: Sancheti Classes          | Message sent successfully
+[2026-11-11 11:24:01] [SUCCESS] Phone: 8484820200      | Name: Career Launcher Pune FC R | Message sent successfully
+[2026-11-11 11:25:27] [INVALID] Phone: 7264006300      | Name: Tarkashastra              | Not registered on WhatsApp
